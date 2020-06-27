@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>学生信息管理系统</title>
+</head>
+<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<body>
+<center><h1>学生信息管理系统</h1></center>
+<br>
+<center>
+    <div id="app">
+        <table>
+            <tr>
+                <td>用户名：</td>
+                <td><input type="text" v-model="username"></td>
+            </tr>
+            <tr>
+                <td>密码:</td>
+                <td><input type="password" v-model="password"></td>
+            </tr>
+            <tr>
+                <td>角色</td>
+                <td>
+                    <label><input type="radio" v-model="character" value="T">老师</label>
+                    <label><input type="radio" v-model="character" value="S">学生</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <center><button v-on:click="login()">登录</button></center>
+                </td>
+                <td>
+                    <center><button v-on:click="self.location='/register'">注册</button></center>
+                </td>
+            </tr>
+        </table>
+    </div>
+</center>
+</body>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            username: '',
+            password: '',
+            character: 'T'
+        },
+        methods:{
+            login:function () {
+                console.log(this.username);
+                this.$http.post("/login",{username:this.username,password: this.password,character: this.character},{emulateJSON:true})
+                .then(function (value) {
+                    console.log(value);
+                    console.log(value.body.success===1);
+                    if (value.body.success===1){
+                        sessionStorage.setItem("token",value.body.token);
+                        if (this.character==="S")
+                            self.location='/student/'+value.body.user.id;
+                        else
+                            self.location='/teacher/'+value.body.user.id;
+                    }
+                    else{
+                        if(this.character==='T'){
+                            alert(value.body.msg);
+                        }
+                    }
+                })
+
+            }
+        }
+    });
+
+
+</script>
+
+</html>

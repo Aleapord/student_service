@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加班级</title>
+</head>
+<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<body>
+<div id="app">
+    <center>
+        <h1>添加班级</h1><br>
+        <hr>
+        班级名： <input type="text" v-model="name"><br>
+        班主任： <select v-model="t_id">
+        <option v-for="tea in all_tea" :value="tea.id">{{tea.name}}</option>
+    </select>
+        <button v-on:click="tianjia()">添加</button>
+
+
+    </center>
+</div>
+</body>
+<script>
+    var vm=new Vue({
+        el:'#app',
+        data:{
+            all_tea:'',
+            name:'',
+            t_id:''
+        },
+        methods:{
+            get_all_tea:function () {
+                    this.$http.post("/get_all_tea")
+                    .then(function (value) {
+                        console.log(value)
+                        this.all_tea =value.body.all_tea;
+
+                    });
+
+            },
+            tianjia:function () {
+                this.$http.post("/classes/add",{name:this.name,persident_id:this.t_id},{emulateJSON:true})
+                    .then(function (value) {
+                        alert("添加成功！")
+
+                    });
+            }
+        }
+
+
+    })
+    vm.get_all_tea();
+
+</script>
+</html>

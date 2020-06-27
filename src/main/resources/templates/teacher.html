@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生管理系统</title>
+</head>
+
+<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+
+<body>
+<center>
+    <div id="app">
+
+        <center><h1>班级列表</h1></center>
+        <center>
+
+            <hr>
+            <br>
+
+            <table border="1">
+                <tr>
+                    <td>
+                        班级id
+                    </td>
+                    <td>
+                        班级名
+                    </td>
+                    <td>
+                        班主任
+                    </td>
+                    <td>
+                        操作
+                    </td>
+
+                </tr>
+                <tr v-for="cla in all_class">
+                    <td>{{cla.id}}</td>
+                    <td>{{cla.name}}</td>
+                    <td>{{cla.name1}}</td>
+                    <td><a :href="'/classes/'+cla.id">管理班级</a></td>
+                </tr>
+            </table>
+            <button v-on:click="add_classes()">添加班级</button>
+            <hr>
+            <br>
+
+            <h2>学生列表</h2>
+            <table border="1">
+                <tr>
+                    <td>学生id</td>
+                    <td>姓名
+                    </td>
+                    <td>
+                        性别
+                    </td>
+                    <td>
+                        所属班级
+                    </td>
+                    <td>
+                        总学分
+                    </td>
+                    <td>
+                        修改学生信息
+                    </td>
+                </tr>
+                <tr v-for="dao in all_stu">
+                    <td>{{dao.student.id}}</td>
+                    <td>{{dao.student.name}}</td>
+                    <td>{{dao.student.sex}}</td><td>{{dao.classes.name}}</td>
+                    <td>{{dao.student.total_creadits}}</td>
+                    <td><a :href="'/stu/'+dao.student.id">修改</a></td>
+
+
+
+                </tr>
+            </table>
+
+        </center>
+        <hr>
+        <br>
+        <center>
+            <h2>课程列表</h2>
+            <br>
+            <table border="1">
+                <tr>
+                <td>课程id</td>
+                <td>课程名</td>
+                <td>教师名字</td>
+                <td>学时</td>
+                <td>学分</td>
+                    <td>查看学习情况</td>
+
+                </tr>
+                <tr v-for="cd in all_course">
+                    <td>{{cd.course.id}}</td>
+                    <td>{{cd.course.name}}</td>
+                    <td>{{cd.teacher.name}}</td>
+                    <td>{{cd.course.period}}</td>
+                    <td>{{cd.course.credit}}</td>
+                    <td><a :href="'/course/'+cd.course.id">查看</a></td>
+
+                </tr>
+
+            </table>
+        </center>
+
+    </div>
+
+</center>
+</body>
+
+<script>
+    var em=new Vue({
+        el:'#app',
+        data:{
+            all_class:'',
+            all_stu:'',
+            all_course:''
+        },
+        methods:{
+            get_classes: function () {
+                this.$http.post("/get_all_classes")
+                    .then(function (value) {
+                        this.all_class =value.body.all_class;
+
+                    });
+
+            },
+            get_all_stu:function () {
+                    this.$http.post("/get_all_student")
+                    .then(function (value) {
+                        console.log(value.body.all_stu)
+                        this.all_stu =value.body.all_stu;
+
+                    });
+
+            },
+            get_all_course:function () {
+                this.$http.post("/get_all_course")
+                    .then(function (value) {
+                        console.log(value);
+                        this.all_course=value.body.all_course;
+                    });
+                    },
+            add_classes:function () {
+                self.location="/classes/add"
+
+            }
+
+
+
+        }
+    })
+    em.get_classes();
+    em.get_all_stu();
+    em.get_all_course();
+
+</script>
+</html>

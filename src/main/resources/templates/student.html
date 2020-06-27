@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生管理界面</title>
+</head>
+<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<body>
+<div id="app">
+    <center>
+        <h1>姓名：{{student.name}}</h1><br>
+        <h2>我的班级：{{my_classes.name}}</h2><br>
+        <h3>我的选课:</h3><br>
+        <table border="1">
+            <tr><td>课程名</td><td>学时</td><td>学分</td></tr>
+            <tr v-for="course in my_courses"><td>{{course.name}}</td><td>{{course.period}}</td><td>{{course.credit}}</td></tr>
+        </table>
+    </center>
+
+
+</div>
+</body>
+<script>
+    var vm=new Vue({
+        el:'#app',
+        data:{
+            student:'',
+            my_classes:'',
+            my_courses:''
+        },
+        methods:{
+            get_all_inf:function () {
+                 var url=window.location.href+"/get_all_inf"
+                this.$http.post(url,{token:sessionStorage.getItem("token")},{emulateJSON:true}).then(function (value) {
+                    console.log(value.body);
+                    this.student=value.body.student;
+                    this.my_classes=value.body.my_classes;
+                    this.my_courses=value.body.my_courses;
+                    });
+                    }
+
+            }
+        });
+        vm.get_all_inf();
+</script>
+
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>班级管理</title>
+</head>
+<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<body>
+<div id="app">
+    <center>
+
+        <h1>修改班级信息</h1><br>
+        <hr>
+        班级名： <input type="text" v-model="name"><br>
+        班主任：<select  v-model="tea">
+        <option v-for="tea in all_tea"  :value="tea.id">{{tea.name}}</option>
+    </select><button v-on:click="xiugai()">修改班级信息</button>
+        <hr>
+        <br>
+        <div class="h3">  <h2 class="page-header">学生列表</h2></div>
+
+        <table border="1">
+            <tr>
+                <td>学生名</td>
+                <td>操作</td>
+            </tr>
+            <tr v-for="stu in all_stu">
+                <td>{{stu.name}}</td>
+                <td>
+                    <a :href="'/stu/'+stu.id">修改</a></td>
+
+            </tr>
+        </table>
+    </center>
+
+</div>
+
+</body>
+<script>
+    var vm=new Vue({
+       el:'#app',
+       data:{
+           cls:'',
+           tea:'',
+           name:'',
+           all_tea:'',
+           all_stu:'',
+           all_Stu:''
+       } ,
+        methods:{
+            getUrlsub: function (href) {
+                console.log(href);
+                let index = href.lastIndexOf("\/");
+                let str = href.substring(index + 1,href.length);
+
+                return str
+
+            },
+           get_cls:function () {
+               cls_id=this.getUrlsub(window.location.href);
+               this.$http.post("/get_cls/"+cls_id)
+                   .then(function (value) {
+                       this.cls=value.body.cls;
+                       this.tea=this.cls.persident_id;
+                       this.name=this.cls.name;
+                   })
+
+
+
+           },
+            get_all_tea:function () {
+
+                this.$http.post("/get_all_tea")
+                    .then(function (value) {
+                        this.all_tea=value.body.all_tea;
+                    })
+
+            },
+            get_all_stu:function () {
+                cls_id=this.getUrlsub(window.location.href);
+                this.$http.post("/get_all_stu/"+cls_id)
+                    .then(function (value) {
+                        console.log(value.body.all_stu)
+                        this.all_stu=value.body.all_stu;
+                    })
+
+            },
+            get_all_Stu:function () {
+                cls_id=this.getUrlsub(window.location.href);
+                this.$http.post("/get_all_Stu")
+                    .then(function (value) {
+                        this.all_Stu=value.body.all_Stu;
+                    })
+
+            },
+            re:function (url) {
+                this.$http.post(url)
+                    .then(function (value) {
+                        alert("移除成功！")
+                    });
+
+            },
+            xiugai: function () {
+                cls_id=this.getUrlsub(window.location.href);
+                this.$http.post("/classes/change",{id:cls_id, name:this.name,persident_id:this.tea},{emulateJSON:true})
+                    .then(function (value) {
+                        alert("修改成功！")
+
+                    });
+
+            }
+        }
+
+    });
+    vm.get_cls();
+    vm.get_all_tea();
+    vm.get_all_stu();
+    vm.get_all_Stu();
+</script>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+ <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+	<title>添加学生</title>
+<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> 
+    <link href="https://v3.bootcss.com/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="https://v3.bootcss.com/examples/signin/signin.css" rel="stylesheet">
+     <link href="https://v3.bootcss.com/examples/dashboard/dashboard.css" rel="stylesheet">
+    <link href="https://v3.bootcss.com/examples/navbar/navbar.css" rel="stylesheet">
+    <script src="https://v3.bootcss.com/assets/js/ie-emulation-modes-warning.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+   <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+
+</head>
+<body>
+<div class="container" id="app">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <ul class="nav navbar-nav">
+                    <li ><a class="navbar-brand" href="/admin/">管理所有班级</a></li>
+                </ul>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li ><a href="/classes/add">添加班级</a></li>
+                    <li ><a href="/stu">管理所有学生</a></li>
+                    <li ><a href="/stu/add">添加学生</a></li>
+                    <li><a href="/cou/">管理所有课程</a></li>
+                    <li class="active"><a href="/cou/add">添加课程</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#" onclick="myFunction()">注销用户</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+    </nav>
+ <script>
+function myFunction(){
+	var r=confirm("是否确定注销!");
+	if (r==true){
+		window.location.href="logout";
+	}
+	else{
+	}
+}
+</script>
+<div class="form-signin" >
+<table>
+    <tr>
+        <td><label for="inputPassword" >课程名： </label></td>
+        <td><input v-model="name" type="text" name="sname" id="sname"  class="form-control" placeholder="请输入姓名" required></td>
+        </tr>
+
+    <tr>
+        <td><label for="inputEmail" >选择老师： </label></td>
+        <td>  <select  v-model="tea" id="sel" class="form-control">
+            <option v-for="tea in all_tea" :value="tea.id">{{tea.name}}</option>
+
+        </select></td>
+        </tr>
+        <tr>
+        <td><label for="inputEmail" >学分: </label></td>
+        <td> <select class="form-control" v-model="credit">
+            <option v-for="cla in all_cla" :value="cla.id" >{{cla.name}}</option>
+        </select></td>
+        </tr>
+    <tr>
+        <td><label for="inputPassword" >学时： </label></td>
+        <td><input v-model="period" type="text" name="sname" id="sname"  class="form-control" placeholder="请输入学分" required></td>
+    </tr>
+
+    <tr>
+</table>
+<br><br>
+        <button v-on:click="tianjia()" class="btn btn-lg btn-primary btn-block" type="submit" name="" value="提交" onclick="return check()">添加</button>
+      </div>
+</div>
+</body>
+<script>
+    var vm=new Vue({
+        el:'#app',
+        data:{
+            all_cla:'',
+            name:'',
+            gender:'',
+            cls_id:'',
+            credit:'',
+            tea:'',
+            period:''
+        },
+        methods: {
+            get_cal:function () {
+
+                this.$http.post("/get_all_classes")
+                    .then(function (value) {
+                        console.log(value)
+                        this.all_cla =value.body.all_class;
+
+                    });
+
+            },
+
+            getUrlsub: function (href) {
+                console.log(href);
+                let index = href.lastIndexOf("\/");
+                let str = href.substring(index + 1,href.length);
+
+                return str
+
+            },
+            get_stu:function () {
+                var loc=window.location.href;
+                stu_id=this.getUrlsub(loc);
+                this.$http.post("/get_stu/"+stu_id)
+                    .then(function (value) {
+                        console.log(value)
+                        this.stu =value.body.stu;
+                        this.name=value.body.stu.name;
+                        this.cls_id=value.body.stu.class_id;
+                        this.gender=value.body.stu.sex;
+                        this.credit=value.body.stu.total_creadits;
+                    });
+
+            },
+            tianjia:function () {
+                this.$http.post("/stu/add/",{name:this.name,sex: this.gender,class_id: this.cls_id,total_creadits:this.credit},{emulateJSON:true})
+                    .then(function (value) {
+                        if (value.body.success!==1){
+                            alert(value.body.msg);
+                        }else {
+                            alert("添加成功！")
+                        }
+                    });
+            }
+
+
+
+        }
+
+    });
+    vm.get_cal();
+    vm.get_stu();
+
+</script>
+</html>

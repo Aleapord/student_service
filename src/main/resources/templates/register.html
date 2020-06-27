@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生管理系统注册</title>
+</head>
+<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<body>
+<center><h1>注册</h1></center>
+<div id="app">
+    <center> <table>
+        <tr>
+            <td>用户名：</td>
+            <td><input type="text" v-model="username"></td>
+        </tr>
+        <tr>
+            <td>性别</td>
+            <td><input type="radio" v-model="gender" value="male">男 <input type="radio" v-model="gender" value="female">女</td>
+        </tr>
+        <tr>
+            <td>密码:</td>
+            <td><input type="password" v-model="password1"></td>
+        </tr>
+        <tr>
+            <td>确认密码:</td>
+            <td><input type="password" v-model="password2"></td>
+        </tr>
+        <tr>
+            <td>角色</td>
+            <td>
+                <label><input type="radio" v-model="character" value="T">老师</label>
+                <label><input type="radio" v-model="character" value="S">学生</label>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <center><button v-on:click="register()">注册</button></center>
+            </td>
+        </tr>
+    </table></center>
+
+
+</div>
+
+</body>
+<script>
+    var vm=new Vue({
+        el:'#app',
+        data:{
+            username:'',
+            gender:"",
+            password1:'',
+            password2:'',
+            character:''
+        },
+        methods:{
+            register:function () {
+                if (this.password1!==this.password2){
+                    alert("两次输入密码不一致！")
+                }
+                else{
+                    console.log(this.username);
+                    this.$http.post("/reg",{username:this.username,password: this.password1,character: this.character,gender:this.gender},{emulateJSON:true})
+                        .then(function (value){
+                            if (value.body.success===1){
+                                alert("注册成功！");
+                                self.location='/student/'+value.body.user.id;
+                            }
+                            else{
+                                if(this.character==='T'){
+                                    alert(value.body.msg);
+                                }
+                            }
+
+                        });
+                }
+
+            }
+        }
+    })
+
+</script>
+</html>

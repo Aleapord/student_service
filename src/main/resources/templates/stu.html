@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生信息</title>
+</head>
+<script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+<script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<body>
+<div id="app">
+    <center>
+        <h1>修改学生信息</h1>
+        姓名： <input v-model="name" type="text">
+        <br> 性别：<select v-model="gender"> <option value="male" >男</option>
+        <option value="female" >女</option>
+    </select>
+        <br>
+        所属班级
+        <select  v-model="cls_id">
+            <option v-for="cla in all_cla" :value="cla.id" >{{cla.name}}</option>
+        </select><br>
+        学分：<input v-model="credit" type="text" >
+        <button v-on:click="xiugai()">修改</button>
+    </center>
+</div>
+</body>
+<script>
+    var vm=new Vue({
+        el:'#app',
+        data:{
+            all_cla:'',
+            name:'',
+            gender:'',
+            cls_id:'',
+            credit:''
+
+
+        },
+        methods: {
+            get_cal:function () {
+
+                this.$http.post("/get_all_classes")
+                    .then(function (value) {
+                        console.log(value)
+                        this.all_cla =value.body.all_class;
+
+                    });
+
+            },
+
+            getUrlsub: function (href) {
+                console.log(href);
+                let index = href.lastIndexOf("\/");
+                let str = href.substring(index + 1,href.length);
+
+                return str
+
+            },
+            get_stu:function () {
+             var loc=window.location.href;
+             stu_id=this.getUrlsub(loc);
+                this.$http.post("/get_stu/"+stu_id)
+                    .then(function (value) {
+                        console.log(value)
+                        this.stu =value.body.stu;
+                        this.name=value.body.stu.name;
+                        this.cls_id=value.body.stu.class_id;
+                        this.gender=value.body.stu.sex;
+                        this.credit=value.body.stu.total_creadits;
+                    });
+
+            },
+            xiugai:function () {
+                this.$http.post("/stu/"+this.stu.id+"/change",{name:this.name,sex: this.gender,class_id: this.cls_id,total_creadits:this.credit},{emulateJSON:true})
+                    .then(function (value) {
+                        if (value.body.success!==1){
+                            alert(value.body.msg);
+                        }else {
+                            alert("修改成功！")
+                        }
+                    });
+                    }
+
+
+
+        }
+
+    });
+    vm.get_cal();
+    vm.get_stu();
+
+</script>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>辅导员信息查看</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://v3.bootcss.com/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="https://v3.bootcss.com/examples/dashboard/dashboard.css" rel="stylesheet">
+    <link href="https://v3.bootcss.com/examples/navbar/navbar.css" rel="stylesheet">
+    <script src="https://v3.bootcss.com/assets/js/ie-emulation-modes-warning.js"></script>
+        <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+        <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+    </head>
+ <body>
+ <div class="container" id="app">
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <ul class="nav navbar-nav">
+            <li class="active"><a class="navbar-brand" href="/admin/">管理所有班级</a></li>
+            </ul>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li ><a href="/classes/add">添加班级</a></li>
+                <li><a href="/stu">管理所有学生</a></li>
+                <li><a href="/stu/add">添加学生</a></li>
+                <li><a href="/cou/">管理所有课程</a></li>
+                <li><a href="/cou/add">添加课程</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="#" onclick="myFunction()">注销用户</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+ <script>
+function myFunction(){
+	var r=confirm("是否确定注销!");
+	if (r==true){
+		window.location.href="logout";
+	}
+	else{
+	}
+}
+</script>
+<table>
+ <tr><td>欢迎你  管理员 </td><td ></td></tr>
+    <div class="h3"><p class="page-header">修改班级</p></div>
+<center>          <table>
+    <tr>
+        <td><label for="user" >班级名：&nbsp;&nbsp;&nbsp;</label></td>
+        <td><input v-model="name" type="text" id="user"  name="number" class="form-control" placeholder="请输入班级名" required autofocus></td>
+    </tr>
+    <tr>
+        <td>
+            <label for="sel">选择老师</label>
+        </td>
+        <td>
+            <select  v-model="tea" id="sel" class="form-control">
+                <option v-for="tea in all_tea" :value="tea.id">{{tea.name}}</option>
+
+            </select>
+        </td>
+    </tr>
+
+
+
+
+</table> <button v-on:click="xiugai()" class="btn btn-lg btn-primary"  name="" value="提交">修改</button>
+
+</center>
+
+
+
+<div class="h3"><p class="page-header">学生列表</p></div>
+ </table>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr> <th width="16%">学生id</th>
+             <th width="16%">姓名</th>
+            <th width="16%">性别</th>
+            <th width="16%">      </th>
+            <th width="16%">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+               <tr v-for="stu in all_stu">
+                <td >{{stu.id}}</td>
+                <td >{{stu.name}}</td>
+                <td >{{stu.sex}}</td>
+                <td >   </td>
+                <td>
+                    <a href="#" v-on:click="sanchu(cla.id)">删除</a>
+                </td>
+            </tr>
+              </tbody>
+            </table>
+
+          </div>
+ </div>
+ </body>
+    <script>
+        var vm=new Vue({
+            el:'#app',
+            data:{
+                cls:'',
+                tea:'',
+                name:'',
+                all_tea:'',
+                all_stu:'',
+                all_Stu:''
+            } ,
+            methods:{
+                getUrlsub: function (href) {
+                    console.log(href);
+                    let index = href.lastIndexOf("\/");
+                    let str = href.substring(index + 1,href.length);
+
+                    return str
+
+                },
+                get_cls:function () {
+                    cls_id=this.getUrlsub(window.location.href);
+                    this.$http.post("/get_cls/"+cls_id)
+                        .then(function (value) {
+                            this.cls=value.body.cls;
+                            this.tea=this.cls.persident_id;
+                            this.name=this.cls.name;
+                        })
+
+
+
+                },
+                get_all_tea:function () {
+
+                    this.$http.post("/get_all_tea")
+                        .then(function (value) {
+                            this.all_tea=value.body.all_tea;
+                        })
+
+                },
+                get_all_stu:function () {
+                    cls_id=this.getUrlsub(window.location.href);
+                    this.$http.post("/get_all_stu/"+cls_id)
+                        .then(function (value) {
+                            console.log(value.body.all_stu)
+                            this.all_stu=value.body.all_stu;
+                        })
+
+                },
+                get_all_Stu:function () {
+                    cls_id=this.getUrlsub(window.location.href);
+                    this.$http.post("/get_all_Stu")
+                        .then(function (value) {
+                            this.all_Stu=value.body.all_Stu;
+                        })
+
+                },
+                re:function (url) {
+                    this.$http.post(url)
+                        .then(function (value) {
+                            alert("移除成功！")
+                        });
+
+                },
+                xiugai: function () {
+                    cls_id=this.getUrlsub(window.location.href);
+                    this.$http.post("/classes/change",{id:cls_id, name:this.name,persident_id:this.tea},{emulateJSON:true})
+                        .then(function (value) {
+                            alert("修改成功！")
+
+                        });
+
+                },
+                sanchu:function (stu_id) {
+                    this.$http.post("/stu/delete/"+stu_id)
+                        .then(function (value) {
+                            alert("删除成功");
+                            history.go(0);
+
+                        });
+
+
+                }
+            }
+
+        });
+        vm.get_cls();
+        vm.get_all_tea();
+        vm.get_all_stu();
+        vm.get_all_Stu();
+    </script>
+</html>

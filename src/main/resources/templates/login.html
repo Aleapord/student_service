@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head> 
+ <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+	<title>学生信息管理系统</title>
+<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> 
+    <link href="https://v3.bootcss.com/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="https://v3.bootcss.com/examples/signin/signin.css" rel="stylesheet">
+    <script src="https://v3.bootcss.com/assets/js/ie-emulation-modes-warning.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+   <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+<script type="text/javascript">
+		function $(id) {return document.getElementById(id)	}
+		function check(){
+			var user = $("user").value
+			var pwd = $("pwd").value
+			
+			
+			if (user == "" || pwd == "") {
+				alert("输入的用户名或密码不能为空").
+				return false;
+			}
+			if (pwd.length< 3) {
+				alert("密码不能小于3位数！")
+				return false
+			}
+			
+			return true;
+			
+		}		
+	</script>
+</head>
+
+<script>
+
+		function sentAssisant() {
+			targetForm = document.forms[0];
+			targetForm.action = "/students/loginPage";
+		}
+		function sentAdmin() {
+			targetForm = document.forms[0];
+			targetForm.action = "/admin/loginPage";
+		}
+	</script>
+<body>
+     <h1 align="center">学生信息管理系统</h1>
+	<div class="container" id="app">
+      <div class="form-signin" >
+        <h2 class="form-signin-heading">请登录 </h2>
+        <label for="inputEmail" class="sr-only">账号</label>
+        <input v-model="username" type="text" id="user" name="tno" class="form-control" placeholder="请输入账号" required autofocus>
+        <label  for="inputPassword" class="sr-only">密码</label>
+        <input v-model="password" type="password" id="pwd" name="password"  class="form-control" placeholder="请输入密码" required>
+        <div class="checkbox">
+        &nbsp;&nbsp;&nbsp;
+          <label>
+            <input v-model="character" type="radio" value="S" name="admin" onclick="sentAssisant()"> 老师
+          </label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <label>
+            <input v-model="character" type="radio" value="T" name="admin" onclick="sentAdmin()"> 院系管理员
+          </label>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block"  v-on:click="login()" value="登录" onclick="return check()">登录</button>
+      </div>
+
+    </div> 
+
+    <script src="https://v3.bootcss.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+     <script>
+         var vm = new Vue({
+             el: '#app',
+             data: {
+                 username: 'sss',
+                 password: 'sss',
+                 character: 'T'
+             },
+             methods:{
+                 login:function () {
+                     console.log(this.username);
+                     this.$http.post("/login",{username:this.username,password: this.password,character: this.character},{emulateJSON:true})
+                         .then(function (value) {
+                             console.log(value);
+                             console.log(value.body.success===1);
+                             if (value.body.success===1){
+                                 sessionStorage.setItem("token",value.body.token);
+                                 if (this.character==="S")
+                                     self.location='/student/'+value.body.user.id;
+                                 else
+                                     self.location='/admin/';
+                             }
+                             else{
+                                 if(this.character==='T'){
+                                     alert(value.body.msg);
+                                 }
+                             }
+                         })
+
+                 }
+             }
+         });
+
+     </script>
+</body>
+</html>
